@@ -1,0 +1,87 @@
+@myapp_host=localhost:8080
+
+###
+http://localhost:8080
+
+###
+
+GET /
+Host: {{myapp_host}}
+Accept: text/html
+
+###
+
+GET /
+Host: {{myapp_host}}
+Accept: application/json
+
+###
+
+GET /api/hello
+Host: {{myapp_host}}
+Accept: text/plain
+
+###
+
+GET /api/hello
+Host: {{myapp_host}}
+Accept: text/html
+
+###
+
+GET /api/hello
+Host: {{myapp_host}}
+Accept: application/json
+
+###
+
+GET /api/customers
+Host: {{myapp_host}}
+Accept: application/json
+###
+
+GET /api/customers/5daee0c1-f18a-4c06-8422-96ec369b8815
+Host: {{myapp_host}}
+Accept: application/json
+###
+
+GET /api/customers/5daee0c1-f18a-4c06-8422-96ec369b8817
+Host: {{myapp_host}}
+Accept: application/json
+###
+
+POST /api/customers
+Host: {{myapp_host}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "firstname": "Shyamala", 
+    "lastname": "Rao", 
+    "email": "shaymala.rao@xmpl.com", 
+    "phone": "9276572121", 
+    "gender": "FEMALE", 
+    "city": "Mysore"
+}
+###
+
+PATCH /api/customers/5daee0c1-f18a-4c06-8422-96ec369b8815
+Host: {{myapp_host}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "phone": "9844083934"
+}
+###
+
+PUT /api/customers/5daee0c1-f18a-4c06-8422-96ec369b8815
+Host: {{myapp_host}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "firstname": "Vinod",
+    "email": "vinod@vinod.co",
+    "phone": "9844083934"
+}

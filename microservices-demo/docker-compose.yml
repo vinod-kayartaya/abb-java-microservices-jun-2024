@@ -1,0 +1,98 @@
+services:
+
+  keycloak-service:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak-service
+    ports:
+      - "5050:8080"
+    networks:
+      - actuator-demo-network
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=Welcome#123
+    volumes:
+      - keycloak-volume:/opt/keycloak/data
+    command: start-dev
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "7070:8080"
+    networks:
+      - actuator-demo-network
+    environment:
+      - KEYCLOAK_SERVER_HOST=keycloak-service
+      - KEYCLOAK_REALM=northwind-realm
+      - KEYCLOAK_CLIENT_ID=northwind-ops
+      - KEYCLOAK_CLIENT_SECRET=WxpYYTpipD1QjjziM2dvmlBHJ2SxDjgU
+    depends_on:
+      - keycloak-service
+
+  admin-ui-service:
+    build:
+      context: ./actuator-admin-ui
+      dockerfile: Dockerfile
+    container_name: admin-ui-service
+    ports:
+      - "9090:8080"
+    networks:
+      - actuator-demo-network
+
+  redis-service:
+    image: redis/redis-stack:latest
+    container_name: redis-service
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    networks:
+      - actuator-demo-network
+      
+  customer-service:
+    build: 
+      context: ./customer-service
+      dockerfile: Dockerfile
+    container_name: customer-service
+    environment:
+      - DB_HOST=10.170.216.158
+      - ADMIN_SERVER_HOST=admin-ui-service
+      - ADMIN_SERVER_PORT=8080
+      - REDIS_HOST=redis-service
+      - MINIO_HOST=minio-service
+      - KEYCLOAK_SERVER_HOST=keycloak-service
+    ports:
+      - "8080:8080"
+    networks:
+      - actuator-demo-network
+    depends_on:
+      - admin-ui-service
+      - redis-service
+      - minio-service
+      - keycloak-service
+
+  minio-service:
+    image: minio/minio:latest
+    container_name: minio-service
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=Welcome#123
+    command: server /var/lib/minio/data --console-address ":9001"
+    volumes:
+      - "minio-volume:/var/lib/minio/data"
+    networks:
+      - actuator-demo-network
+
+networks:
+  actuator-demo-network:
+    driver: bridge
+
+volumes:
+  minio-volume:
+    driver: local
+  keycloak-volume:
+    driver: local
